@@ -3,7 +3,8 @@ from django.contrib import messages, auth
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from accounts.models import Account
-from .forms import create_user_form
+from master.models import Department
+from .forms import create_user_form, create_department_form
 
 
 # Create your views here.
@@ -83,7 +84,7 @@ def create_user(request):
             user.save()
             
             messages.success(request,'user created successfull')
-            return redirect('master')            
+            return redirect('users_list')            
             
     else:
         form = create_user_form()
@@ -95,5 +96,74 @@ def create_user(request):
 
 
 
+#Users List
+def users_list(request):
+    users = Account.objects.all()
+    context = {
+        'users':users,
+    }
+    return render(request,'master/user_list.html', context)
 
+
+
+#Create Department view
+def creat_department(request):
+    user = request.user
+    form = create_department_form()
+    if request.method == 'POST':
+        form = create_department_form(request.POST, request.FILES)
+        if form.is_valid():
+            department = form.save(commit=False)
+            department.Created_by = user
+            department.save()
+            return redirect('department_list')
+        else:
+            messages.warning(request, 'enter the correct details')
+
+    context = {
+        'form' : form,
+        }        
+    return render(request, 'master/create_department.html', context)
+
+
+
+
+
+
+
+#department list
+def department_list(request):
+    department = Department.objects.all()
+    context = {
+        'department':department,
+    }
+    return render(request,'master/department_list.html', context)
+
+
+
+
+
+#update Department View
+def update_department(request,id):
+    department = Department.objects.get(id=id)
+    form = create_department_form(instance=department)
+    if request.method == 'POST':
+        form = create_department_form(request.POST, request.FILES, instance=department)
+        if form.is_valid():
+            form.save()
+            return redirect('department_list')
+
+    context = {
+        'form' : form,
+        'department' : department,
+    }        
+    return render(request, 'master/update_department.html', context)
+
+
+
+#delete Department view 
+def delete_department(request,id):
+    department = Department.objects.filter(id=id)
+    department.delete()
+    return redirect('department_list')
 

@@ -1,0 +1,90 @@
+{% extends 'master/master_nav.html' %}
+{% load static %}
+
+
+{% block content %}
+
+
+<div class="page-wrapper">
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="page-breadcrumb bg-white">
+        <div class="row align-items-center">
+            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+                <h4 class="page-title"></h4>
+            </div>
+            
+            <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
+                <div class="d-md-flex">
+                    <ol class="breadcrumb ms-auto">
+                        <li><a href="#" class="fw-normal"></a></li>
+                    </ol>
+                   
+                    <a href="{% url 'create_user' %}" target=""
+                        class="btn btn-danger  d-none d-md-block pull-right ms-3 hidden-xs hidden-sm waves-effect waves-light text-white">Add User</a>
+                </div>
+            </div>
+        </div> 
+        
+    </div>
+   
+    <div class="container-fluid">
+        <!-- ============================================================== -->
+        <!-- Start Page Content -->
+        <!-- ============================================================== -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="white-box">
+                    <h3 class="box-title">Users List</h3>
+                    
+                    <div class="table-responsive">
+                        <table class="table text-nowrap">
+                            <thead>
+                                <tr>
+                                    
+                                    <th class="border-top-0">Name</th>
+                                    <th class="border-top-0">Email</th>
+                                    <th class="border-top-0">Phone</th>
+                                    <th class="border-top-0">Department</th>
+                                    <th class="border-top-0">Role</th>
+                                    
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                              {% for users in users %}
+                                
+                              
+                               
+                                <tr>
+                                    
+                                    <td>{{users.name}}</td>
+                                    <td>{{users.email}}</td>
+                                    <td>{{users.phone_number}}</td>
+                                    <td>{{users.department}}</td>
+                                    <td>{{users.role}}</td>
+                                   
+                                    
+                                </tr>
+                                {% endfor %}
+                               
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+      
+    </div>
+    
+</div>
+<!-- ============================================================== -->
+<!-- End Page wrapper  -->
+<!-- ============================================================== -->
+</div>
+<!-- ============================================================== -->
+<!-- End Wrapper -->
+<!-- ============================================================== -->
+    
+{% endblock content %}

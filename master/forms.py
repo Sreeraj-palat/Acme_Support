@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import ModelForm, widgets
 from accounts.models import Account
+from master.models import Department
 
 
 
@@ -15,3 +16,21 @@ class create_user_form(forms.ModelForm):
         super(create_user_form,self).__init__(*args,**kwargs)        
         for field in self.fields:
             self.fields[field].widget.attrs['class'] =  'form-control' 
+
+
+
+
+
+class create_department_form(forms.ModelForm):
+
+    class Meta:
+        model = Department
+        fields = ['Name', 'Description']
+        
+
+    def __init__(self, *args, **kwargs):
+        super(create_department_form,self).__init__(*args,**kwargs)        
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] =  'form-control' 
+
+
