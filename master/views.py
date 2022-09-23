@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages, auth
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
@@ -164,20 +164,16 @@ def update_department(request,id):
 
 #delete Department view 
 def delete_department(request,id):
-    department_users = None
     department = Department.objects.filter(id=id)
-    user = Account.objects.all()
-    for user in user:
-        print("111111")
-        if user.department == department:
-            print("222222")
-            department_users = user
-            print(department_users)
-
-    if department_users is not None:
-        messages.error(request,"Department has some users you cant delete the department")
-    else:
-
+    print(department)    
+    department_users = Account.objects.filter(department_id=id).exists()
+    print(department_users)
+    if department_users:
+        messages.error(request, "you cant delete the department")
+        print("cant delete")
+        return redirect('department_list')
+    else :
         department.delete()
+        print("deleted")    
     return redirect('department_list')
 
