@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LOgin</title>
+  <title>Login</title>
   <!-- Font Awesome -->
 <link
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
@@ -42,8 +42,8 @@ rel="stylesheet"
 
       <div class="row d-flex justify-content-center">
         <div class="col-lg-8">
-          <h2 class="fw-bold mb-5">Welcome Master</h2>
-          <form action="{% url 'master_login' %}" method="post">
+          <h2 class="fw-bold mb-5">Welcome User</h2>
+          <form action="{% url 'user_login' %}" method="post">
             {% csrf_token %}
             <!-- 2 column grid layout with text inputs for the first and last names -->
             

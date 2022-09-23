@@ -12,7 +12,7 @@
     <meta name="description"
         content="Ample Admin Lite is powerful and clean admin dashboard template, inpired from Bootstrap Framework">
     <meta name="robots" content="noindex,nofollow">
-    <title>Master</title>
+    <title>ACME SUPPORT</title>
     <link rel="canonical" href="" />
     <!-- Favicon icon -->
    
@@ -90,6 +90,7 @@
                         <li>
                             <a class="profile-pic" href="#">
                                 
+                                
                         </li>
                         <!-- ============================================================== -->
                         <!-- User profile and search -->
@@ -120,7 +121,7 @@
                         </li>
                         <li class="sidebar-item pt-2">
                             <a class="sidebar-link waves-effect waves-dark sidebar-link"
-                                href="{% url 'master' %}" aria-expanded="false">
+                                href="{% url 'user_dashboard' %}" aria-expanded="false">
                                 <i class="fa fa-table" aria-hidden="true"></i>
                                 <span class="hide-menu">Dashboard</span>
                             </a>
@@ -130,18 +131,12 @@
                             <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{% url 'department_list' %}"
                                 aria-expanded="false">
                                 <i class="fa fa-credit-card" aria-hidden="true"></i>
-                                <span class="hide-menu">Departments</span>
+                                <span class="hide-menu">Tickets</span>
                             </a>
                         </li>
+    
                         <li class="sidebar-item">
-                            <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{% url 'users_list' %}"
-                                aria-expanded="false">
-                                <i class="fa fa-users" aria-hidden="true"></i>
-                                <span class="hide-menu">Users</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{% url 'master_logout' %}"
+                            <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{% url 'user_logout' %}"
                                 aria-expanded="false">
                                 <i class="far fa-clock" aria-hidden="true"></i>
                                 <span class="hide-menu">Logout</span>

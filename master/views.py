@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from accounts.models import Account
 from master.models import Department
 from .forms import create_user_form, create_department_form
+from accounts.decarators import allowed_users
+from django.http import HttpRequest, HttpResponse
 
 
 # Create your views here.
@@ -14,7 +16,10 @@ from .forms import create_user_form, create_department_form
 #Admin Dashboard view
 @login_required(login_url = 'master_login')
 def master_dashboard(request):
-    return render(request, 'master/master_dashboard.html')
+    if request.user.is_superadmin:
+        return render(request, 'master/master_dashboard.html')
+    else:
+        return HttpResponse('Sorry You are not authorised to Access this page')    
 
 
 
@@ -56,44 +61,47 @@ def master_logout(request):
 
 #Create User view
 def create_user(request):
-    if request.method == 'POST':
-        form = create_user_form(request.POST)
-        if form.is_valid():
-            name = form.cleaned_data['name']
-            phone_number = form.cleaned_data['phone_number']
-            email = form.cleaned_data['email']
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            department = form.cleaned_data['department']
-            role = form.cleaned_data['role']
-            
-
-            user = Account.objects.create_user(
-                name = name,
-                username = username,
-                phone_number = phone_number,
-                email = email,
-                password = password,
+    if request.user.is_superadmin:
+        if request.method == 'POST':
+            form = create_user_form(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data['name']
+                phone_number = form.cleaned_data['phone_number']
+                email = form.cleaned_data['email']
+                username = form.cleaned_data['username']
+                password = form.cleaned_data['password']
+                department = form.cleaned_data['department']
+                role = form.cleaned_data['role']
                 
 
-            )
-            user.role = role
-            user.department = department
-            
-            request.session['phone_number'] = phone_number
-            print(phone_number)
-            user.save()
-            
-            messages.success(request,'user created successfull')
-            return redirect('users_list')            
-            
-    else:
-        form = create_user_form()
+                user = Account.objects.create_user(
+                    name = name,
+                    username = username,
+                    phone_number = phone_number,
+                    email = email,
+                    password = password,
+                    
 
-    context = {
-        'form' : form,
-    }
-    return render(request,'master/create_user.html', context)
+                )
+                user.role = role
+                user.department = department
+                
+                request.session['phone_number'] = phone_number
+                print(phone_number)
+                user.save()
+                
+                messages.success(request,'user created successfull')
+                return redirect('users_list')            
+                
+        else:
+            form = create_user_form()
+
+        context = {
+            'form' : form,
+        }
+        return render(request,'master/create_user.html', context)
+    else:
+        return HttpResponse('Sorry You are not authorised to Access this page')    
 
 
 
@@ -170,10 +178,8 @@ def delete_department(request,id):
     print(department_users)
     if department_users:
         messages.error(request, "you cant delete the department")
-        print("cant delete")
         return redirect('department_list')
     else :
-        department.delete()
-        print("deleted")    
+        department.delete()  
     return redirect('department_list')
 
