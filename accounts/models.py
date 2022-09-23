@@ -10,19 +10,17 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 class MyAccountManager(BaseUserManager):
 
-    def create_user(self, name, username,phone_number, email,role,department, password=None):
+    def create_user(self, name, username,phone_number, email, password=None):
         if not email:
             raise ValueError('User must have an email address')
         if not username:
             raise ValueError('user must have a username')
 
         user = self.model(
-            email = self.normalize_email(email),
-            username = username,
             name = name,
+            username = username,
             phone_number = phone_number,
-            role = role,
-            department = department,
+            email = self.normalize_email(email),    
         )        
 
         user.set_password(password)
@@ -32,11 +30,13 @@ class MyAccountManager(BaseUserManager):
 
     def create_superuser(self, name,email,phone_number,username, password):
         user = self.create_user(
+            name = name,
             email = self.normalize_email(email),
+            phone_number = phone_number,
             username = username,
             password = password,
-            name = name,
-            phone_number = phone_number
+            
+            
         )    
 
         user.is_admin = True
@@ -68,11 +68,11 @@ class Account(AbstractBaseUser):
     date_joined = models.DateTimeField(auto_now_add=True)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     is_superadmin = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name', 'phone_number']
+    REQUIRED_FIELDS = ['name','username', 'phone_number']
 
     objects = MyAccountManager()
 

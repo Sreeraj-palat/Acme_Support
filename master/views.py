@@ -62,22 +62,23 @@ def create_user(request):
             name = form.cleaned_data['name']
             phone_number = form.cleaned_data['phone_number']
             email = form.cleaned_data['email']
-            department = form.cleaned_data['department']
-            password = form.cleaned_data['password']
-            role = form.cleaned_data['role']
             username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            department = form.cleaned_data['department']
+            role = form.cleaned_data['role']
+            
 
             user = Account.objects.create_user(
                 name = name,
+                username = username,
                 phone_number = phone_number,
                 email = email,
-                role = role,
-                department = department,
-                username = username,
                 password = password,
                 
 
             )
+            user.role = role
+            user.department = department
             
             request.session['phone_number'] = phone_number
             print(phone_number)
@@ -163,7 +164,20 @@ def update_department(request,id):
 
 #delete Department view 
 def delete_department(request,id):
+    department_users = None
     department = Department.objects.filter(id=id)
-    department.delete()
+    user = Account.objects.all()
+    for user in user:
+        print("111111")
+        if user.department == department:
+            print("222222")
+            department_users = user
+            print(department_users)
+
+    if department_users is not None:
+        messages.error(request,"Department has some users you cant delete the department")
+    else:
+
+        department.delete()
     return redirect('department_list')
 
