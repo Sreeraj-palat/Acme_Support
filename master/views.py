@@ -20,7 +20,19 @@ def home(request):
 @login_required(login_url = 'master_login')
 def master_dashboard(request):
     if request.user.is_superadmin:
-        return render(request, 'master/master_dashboard.html')
+        users = Account.objects.all()
+        user_count = users.count()
+        department = Department.objects.all()
+        department_count = department.count()
+        ticket = Ticket.objects.all()
+        ticket_count = ticket.count()
+        context = {
+            'user_count' : user_count,
+            'department_count' : department_count,
+            'ticket_count' : ticket_count
+            
+        }
+        return render(request, 'master/master_dashboard.html', context)
     else:
         return HttpResponse('Sorry You are not authorised to Access this page')    
 
