@@ -15,4 +15,7 @@ urlpatterns = [
     path('update_department/<int:id>',views.update_department,name='update_department'),
     path('delete_department/<int:id>',views.delete_department,name='delete_department'),
 
+
+    path('add_ticket/',views.add_ticket,name='add_ticket'),
+
 ]

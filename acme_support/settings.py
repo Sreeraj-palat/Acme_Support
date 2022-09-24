@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'master',
     'accounts',
     'user',
+    'tickets',
 ]
 
 MIDDLEWARE = [
@@ -145,3 +146,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # AUTHENTICATION_BACKENDS = [
 #     'accounts.backends.EmailPhoneUsernameAuthenticationBackend'
 # ]
+
+
+
+ZENDESK_BASE_URL = 'https://sreerajpalat.zendesk.com'
+ZENDESK_API_USERNAME = 'sreerajpalat'
+ZENDESK_API_TOKEN = 'LaCoSj8Jnr07jUwZFA55vaV7XIK7KFPgbDtRQ8SZ'
+ZENDESK_REQUESTER_ID = ...
+ZENDESK_GROUP_ID = '6929454624669'
