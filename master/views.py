@@ -13,7 +13,8 @@ import datetime
 
 # Create your views here.
 
-
+def home(request):
+    return render(request,'welcome.html')
 
 #Admin Dashboard view
 @login_required(login_url = 'master_login')
