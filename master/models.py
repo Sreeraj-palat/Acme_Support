@@ -30,8 +30,8 @@ class Ticket(models.Model):
     subject = models.CharField(max_length=100)
     description = models.TextField(max_length=500)
     priority = models.PositiveSmallIntegerField(choices=PRIORITY_CHOICES, blank=True, null=True)
-    user_email = models.CharField(max_length=100)
-    user_phone_number = models.CharField(max_length=100)
+    email = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
 
 

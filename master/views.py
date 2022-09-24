@@ -217,7 +217,7 @@ def delete_department(request,id):
 
 
 
-#Add Ticket
+#Add Ticket view
 @login_required(login_url = 'master_login')
 def add_ticket(request):
     user = request.user
@@ -228,8 +228,8 @@ def add_ticket(request):
             if form.is_valid():
                 ticket = form.save(commit=False)
                 ticket.user = user
-                ticket.user_email = user.email
-                ticket.user_phone_number = user.phone_number
+                ticket.email = user.email
+                ticket.phone_number = user.phone_number
                 form.save()
 
                 # Generate order number
@@ -257,7 +257,7 @@ def add_ticket(request):
 
 
 
-#Ticket List
+#Ticket List view
 @login_required(login_url = 'master_login')
 def ticket_list(request):
     if request.user.is_superadmin:
@@ -272,7 +272,7 @@ def ticket_list(request):
     
 
 
-#update Ticket
+#update Ticket view
 @login_required(login_url = 'master_login')
 def update_ticket(request,id):
     if request.user.is_superadmin:
