@@ -7,6 +7,7 @@ from master.models import Department, Ticket
 from .forms import create_user_form, create_department_form, add_ticket_form
 from accounts.decarators import allowed_users
 from django.http import HttpRequest, HttpResponse
+import datetime
 
 
 
@@ -230,7 +231,17 @@ def add_ticket(request):
                 ticket.user_email = user.email
                 ticket.user_phone_number = user.phone_number
                 form.save()
-                return redirect('master')
+
+                # Generate order number
+                yr = int(datetime.date.today().strftime('%Y'))
+                dt = int(datetime.date.today().strftime('%d'))
+                mt = int(datetime.date.today().strftime('%m'))
+                d = datetime.date(yr,mt,dt)
+                current_date = d.strftime("%Y%m%d") #20210305
+                ticket_id = current_date + str(ticket.id)
+                ticket.ticket_id = ticket_id
+                form.save()
+                return redirect('ticket_list')
 
             else:
                 messages.error(request, "enter correct details")
@@ -247,14 +258,54 @@ def add_ticket(request):
 
 
 #Ticket List
+@login_required(login_url = 'master_login')
 def ticket_list(request):
     if request.user.is_superadmin:
-        pass
+        ticket = Ticket.objects.all()
+        context = {
+            'ticket' : ticket,
+        }
+        return render(request,'master/ticket_list.html', context)
     else:
         return HttpResponse('Sorry You are not authorised to Access this page')   
     
     
+
+
+#update Ticket
+@login_required(login_url = 'master_login')
+def update_ticket(request,id):
+    if request.user.is_superadmin:
+        ticket = Ticket.objects.get(id=id)
+        form = add_ticket_form(instance=ticket)
+        if request.method == 'POST':
+            form = add_ticket_form(request.POST, request.FILES, instance=ticket)
+            if form.is_valid():
+                form.save()
+                return redirect('ticket_list')
+
+        context = {
+            'form' : form,
+            'ticket' : ticket,
+        }        
+        return render(request, 'master/update_ticket.html', context)
+
+    else:
+        return HttpResponse('Sorry You are not authorised to Access this page')   
+        
+
     
+
+
+#delete Ticket view 
+@login_required(login_url = 'master_login')
+def delete_ticket(request,id):
+    if request.user.is_superadmin:
+        ticket = Ticket.objects.filter(id=id)   
+        ticket.delete()  
+        return redirect('ticket_list')
+    else:
+        return HttpResponse('Sorry You are not authorised to Access this page')   
 
 
 
