@@ -4,10 +4,14 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from accounts.models import Account
 from master.models import Department, Ticket
-from .forms import create_user_form, create_department_form, add_ticket_form
+from .forms import create_user_form, create_department_form, CreateTicket
 from accounts.decarators import allowed_users
 from django.http import HttpRequest, HttpResponse
 import datetime
+from master.zenpy import zenpy_client
+import zenpy
+
+from zenpy.lib.api_objects import Ticket, User,CustomField
 
 
 
@@ -24,12 +28,11 @@ def master_dashboard(request):
         user_count = users.count()
         department = Department.objects.all()
         department_count = department.count()
-        ticket = Ticket.objects.all()
-        ticket_count = ticket.count()
+        
         context = {
             'user_count' : user_count,
             'department_count' : department_count,
-            'ticket_count' : ticket_count
+            
             
         }
         return render(request, 'master/master_dashboard.html', context)
@@ -229,98 +232,52 @@ def delete_department(request,id):
         return HttpResponse('Sorry You are not authorised to Access this page')   
 
 
-
-#Add Ticket view
-@login_required(login_url = 'master_login')
-def add_ticket(request):
-    user = request.user
-    form = add_ticket_form()
-    if request.user.is_superadmin:
-        if request.method=='POST':
-            form = add_ticket_form(request.POST,request.FILES)
-            if form.is_valid():
-                ticket = form.save(commit=False)
-                ticket.user = user
-                ticket.email = user.email
-                ticket.phone_number = user.phone_number
-                form.save()
-
-                # Generate order number
-                yr = int(datetime.date.today().strftime('%Y'))
-                dt = int(datetime.date.today().strftime('%d'))
-                mt = int(datetime.date.today().strftime('%m'))
-                d = datetime.date(yr,mt,dt)
-                current_date = d.strftime("%Y%m%d") #20210305
-                ticket_id = current_date + str(ticket.id)
-                ticket.ticket_id = ticket_id
-                form.save()
-                return redirect('ticket_list')
-
-            else:
-                messages.error(request, "enter correct details")
-                return redirect('add_ticket')
-        context = {
-            'form' : form,
-        }
-        return render(request,'master/add_ticket.html', context)
-
-    else:
-        return HttpResponse('Sorry You are not authorised to Access this page')   
+#Create Ticket view
+def create_ticket(request):
+    user = Account.objects.filter(email= request.user).values('email','phone_number')
+    form = CreateTicket(request.POST, user[0])
+    print(request.user.email)
+    if request.method == "POST":
+        if form.is_valid():
+            print('valid')
+            Email = form.cleaned_data['email']
+            Phone = form.cleaned_data['phone_number']
+            Description = form.cleaned_data['description']
+            Subject = form.cleaned_data['subject']
+            Priority = form.cleaned_data['priority']
+            zenpy_client.tickets.create(
+            Ticket(description=Description,subject=Subject,priority=Priority,
+                requester=User(name=request.user.name, email=request.user.email))
+                )
+            return redirect('ticket_lists')    
+    context = {
+        'form' : form,
+    }        
+    return render(request,'master/add_ticket.html', context)
 
 
 
-
-#Ticket List view
-@login_required(login_url = 'master_login')
-def ticket_list(request):
-    if request.user.is_superadmin:
-        ticket = Ticket.objects.all()
-        context = {
-            'ticket' : ticket,
-        }
-        return render(request,'master/ticket_list.html', context)
-    else:
-        return HttpResponse('Sorry You are not authorised to Access this page')   
-    
-    
+#ticket list
+def ticket_lists(request):
+    tickets=[]
+    for ticket in zenpy_client.search(type='ticket', assignee='sreerajpaalat@gmail.com'):
+        tickets.append(ticket.to_dict())
+       
+        print(ticket)  
+    context = {
+        'tickets':tickets,
+    }
+    return render(request,'master/ticket_list.html', context)
 
 
-#update Ticket view
-@login_required(login_url = 'master_login')
-def update_ticket(request,id):
-    if request.user.is_superadmin:
-        ticket = Ticket.objects.get(id=id)
-        form = add_ticket_form(instance=ticket)
-        if request.method == 'POST':
-            form = add_ticket_form(request.POST, request.FILES, instance=ticket)
-            if form.is_valid():
-                form.save()
-                return redirect('ticket_list')
 
-        context = {
-            'form' : form,
-            'ticket' : ticket,
-        }        
-        return render(request, 'master/update_ticket.html', context)
-
-    else:
-        return HttpResponse('Sorry You are not authorised to Access this page')   
-        
-
-    
-
-
-#delete Ticket view 
-@login_required(login_url = 'master_login')
+#delete ticket
 def delete_ticket(request,id):
-    if request.user.is_superadmin:
-        ticket = Ticket.objects.filter(id=id)   
-        ticket.delete()  
-        return redirect('ticket_list')
-    else:
-        return HttpResponse('Sorry You are not authorised to Access this page')   
-
-
+    for ticket in zenpy_client.search(type='ticket', assignee='sreerajpaalat@gmail.com'):
+        
+        if ticket.id ==id:          
+            zenpy_client.tickets.delete(ticket)
+    return redirect('ticket_lists')
 
 
 

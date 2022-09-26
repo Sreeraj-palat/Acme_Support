@@ -3,10 +3,13 @@ from django.contrib import messages, auth
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from accounts.models import Account
-from master.forms import add_ticket_form
+from master.forms import CreateTicket
 import datetime
 
-from master.models import Ticket
+from master.zenpy import zenpy_client
+import zenpy
+
+from zenpy.lib.api_objects import Ticket, User,CustomField
 
 
 # Create your views here.
@@ -51,80 +54,50 @@ def user_logout(request):
 
 
 
-#user ticket view
-@login_required(login_url = 'user_login')
-def user_add_ticket(request):
-    user = request.user
-    form = add_ticket_form()
-    if request.method=='POST':
-        form = add_ticket_form(request.POST,request.FILES)
+
+# user Create Ticket view
+def user_create_ticket(request):
+    user = Account.objects.filter(email= request.user).values('email','phone_number')
+    form = CreateTicket(request.POST, user[0])
+    print(request.user.email)
+    if request.method == "POST":
         if form.is_valid():
-            ticket = form.save(commit=False)
-            ticket.user = user
-            ticket.email = user.email
-            ticket.phone_number = user.phone_number
-            form.save()
-
-            # Generate order number
-            yr = int(datetime.date.today().strftime('%Y'))
-            dt = int(datetime.date.today().strftime('%d'))
-            mt = int(datetime.date.today().strftime('%m'))
-            d = datetime.date(yr,mt,dt)
-            current_date = d.strftime("%Y%m%d") #20210305
-            ticket_id = current_date + str(ticket.id)
-            ticket.ticket_id = ticket_id
-            form.save()
-            return redirect('user_ticket_list')
-
-        else:
-            messages.error(request, "enter correct details")
-            return redirect('user_add_ticket')
+            print('valid')
+            Email = form.cleaned_data['email']
+            Phone = form.cleaned_data['phone_number']
+            Description = form.cleaned_data['description']
+            Subject = form.cleaned_data['subject']
+            Priority = form.cleaned_data['priority']
+            zenpy_client.tickets.create(
+            Ticket(description=Description,subject=Subject,priority=Priority,
+                requester=User(name=request.user.name, email=request.user.email))
+                )
     context = {
-            'form' : form,
-        }
+        'form' : form,
+    }        
     return render(request,'user/user_add_ticket.html', context)
 
 
 
-
-#user ticket list
-@login_required(login_url = 'user_login')
-def user_ticket_list(request):
-    user = request.user
-    ticket = Ticket.objects.filter(user=user)
+# user ticket list
+def user_ticket_lists(request):
+    tickets=[]
+    for ticket in zenpy_client.search(type='ticket', assignee='sreerajpaalat@gmail.com'):
+        tickets.append(ticket.to_dict())
+       
+        print(ticket)  
     context = {
-            'ticket' : ticket,
-        }
+        'tickets':tickets,
+    }
     return render(request,'user/user_ticket_list.html', context)
 
 
-#user update ticket view
-@login_required(login_url = 'user_login')
-def user_update_ticket(request,id):
-    ticket = Ticket.objects.get(id=id)
-    form = add_ticket_form(instance=ticket)
-    if request.method == 'POST':
-        form = add_ticket_form(request.POST, request.FILES, instance=ticket)
-        if form.is_valid():
-            form.save()
-            return redirect('user_ticket_list')
 
-    context = {
-            'form' : form,
-            'ticket' : ticket,
-        }        
-    return render(request, 'user/user_update_ticket.html', context)
-
-
-
-
-#user delete ticket
-@login_required(login_url = 'user_login')
+# userdelete ticket
 def user_delete_ticket(request,id):
-    ticket = Ticket.objects.filter(id=id)   
-    ticket.delete()  
-    return redirect('user_ticket_list')
+    for ticket in zenpy_client.search(type='ticket', assignee='sreerajpaalat@gmail.com'):
+        
+        if ticket.id ==id:          
+            zenpy_client.tickets.delete(ticket)
+    return redirect('user_ticket_lists')
 
-
-
- 

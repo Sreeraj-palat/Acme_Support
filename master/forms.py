@@ -45,6 +45,26 @@ class add_ticket_form(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(add_ticket_form,self).__init__(*args,**kwargs)        
         for field in self.fields:
-            self.fields[field].widget.attrs['class'] =  'form-control'             
+            self.fields[field].widget.attrs['class'] =  'form-control'   
+
+
+
+
+class CreateTicket(forms.Form):
+    CHOICE = (
+        ('high','high'),
+        ('medium','medium'),
+        ('low','low'),
+    )
+    subject = forms.CharField(max_length=200)
+    description = forms.CharField(max_length=500,widget=forms.Textarea(attrs={"rows":5, "cols":20}))
+    priority = forms.ChoiceField(choices=CHOICE)
+    email = forms.CharField(max_length=100)
+    phone_number = forms.CharField(max_length=100)
+        
+    def __init__(self, *args, **kwargs):
+        super(CreateTicket, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs["class"] = "form-control"                      
 
 

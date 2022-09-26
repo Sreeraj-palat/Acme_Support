@@ -16,10 +16,8 @@ urlpatterns = [
     path('update_department/<int:id>',views.update_department,name='update_department'),
     path('delete_department/<int:id>',views.delete_department,name='delete_department'),
 
-
-    path('add_ticket/',views.add_ticket,name='add_ticket'),
-    path('ticket_list/',views.ticket_list,name='ticket_list'),
-    path('update_ticket/<int:id>',views.update_ticket,name='update_ticket'),
+    path('create_ticket',views.create_ticket,name='create_ticket'),
+    path('ticket_lists/',views.ticket_lists,name='ticket_lists'),
     path('delete_ticket/<int:id>',views.delete_ticket,name='delete_ticket'),
 
 ]

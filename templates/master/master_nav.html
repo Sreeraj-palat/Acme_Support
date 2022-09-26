@@ -142,7 +142,7 @@
                         </li>
 
                         <li class="sidebar-item">
-                            <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{% url 'ticket_list' %}"
+                            <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{% url 'ticket_lists' %}"
                                 aria-expanded="false">
                                 <i class="fa fa-credit-card" aria-hidden="true"></i>
                                 <span class="hide-menu">Tickets</span>
@@ -163,7 +163,7 @@
             </div>
             <!-- End Sidebar scroll-->
         </aside>
-
+        {% include 'alerts.html' %}
         {% block content %}
             
 
